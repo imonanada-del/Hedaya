@@ -207,6 +207,28 @@
   .ans-btn:disabled{ opacity:.55; pointer-events:none; }
   .ans-btn.picked{ outline:5px solid rgba(255,255,255,.85); }
 
+  .mc-options{
+    display:flex; flex-direction:column; gap:.7rem; width:100%; max-width:640px;
+    margin:0 auto; padding-bottom:1rem;
+  }
+  .mc-option{
+    background:#fff; color:var(--navy); border-radius:18px; padding:.9rem 1.1rem;
+    font-weight:800; font-size:1.02rem; text-align:right; display:flex; align-items:center; gap:.7rem;
+    box-shadow:0 5px 0 rgba(0,0,0,.14); transition:transform .1s ease, box-shadow .1s ease;
+    min-height:56px; line-height:1.5; width:100%;
+  }
+  .mc-option:active{ transform:translateY(4px); box-shadow:0 1px 0 rgba(0,0,0,.14); }
+  .mc-option .opt-bullet{
+    flex-shrink:0; width:30px; height:30px; border-radius:50%; background:var(--cream-2); color:var(--navy-soft);
+    display:flex; align-items:center; justify-content:center; font-weight:900; font-size:.95rem;
+  }
+  .mc-option.correct{ background: linear-gradient(180deg, #3FDC9A, #1FAF74); color:#fff; }
+  .mc-option.correct .opt-bullet{ background:rgba(255,255,255,.3); color:#fff; }
+  .mc-option.wrong{ background: linear-gradient(180deg, var(--coral), var(--coral-dark)); color:#fff; }
+  .mc-option.wrong .opt-bullet{ background:rgba(255,255,255,.3); color:#fff; }
+  .mc-option.dim{ opacity:.55; }
+  .mc-option:disabled{ pointer-events:none; }
+
   /* ===================== RESULT SCREEN ===================== */
   #result-screen{
     align-items:center; justify-content:center; min-height:100dvh; padding:2rem 1rem; position:relative;
@@ -297,9 +319,9 @@
   <main class="games-grid">
     <button class="game-card active-card" onclick="openGame()">
       <span class="card-icon">🌟</span>
-      <h2>لعبة القناعة</h2>
-      <p>صح أم خطأ؟ اختبر معلوماتك في خُلُق القناعة</p>
-      <span class="card-count">٩ أسئلة</span>
+      <h2>لعبة اسم الله المهيمن</h2>
+      <p>ضع علامة ✅ أو ❎، واختر الإجابة الصحيحة</p>
+      <span class="card-count">١٧ سؤالًا</span>
       <span class="play-btn">ابدأ اللعبة</span>
     </button>
   </main>
@@ -315,21 +337,23 @@
 
   <div class="question-area">
     <div class="q-card">
-      <span class="q-label">هل هذه العبارة صحيحة؟</span>
+      <span class="q-label" id="qLabel">هل هذه العبارة صحيحة؟</span>
       <p class="q-text" id="qText"></p>
       <div class="sparkle-layer" id="sparkleLayer"></div>
     </div>
     <div class="feedback" id="feedback"></div>
   </div>
 
-  <div class="answers-row">
-    <button class="ans-btn true-btn" id="btnTrue" onclick="answer(true)">
+  <div class="answers-row" id="tfRow">
+    <button class="ans-btn true-btn" id="btnTrue" onclick="answerTF(true)">
       ✅ <span>صح</span>
     </button>
-    <button class="ans-btn false-btn" id="btnFalse" onclick="answer(false)">
+    <button class="ans-btn false-btn" id="btnFalse" onclick="answerTF(false)">
       ❎ <span>خطأ</span>
     </button>
   </div>
+
+  <div class="mc-options" id="mcOptions"></div>
 </section>
 
 <!-- ===================== RESULT SCREEN ===================== -->
@@ -351,15 +375,60 @@
 
 <script>
   const questions = [
-    { text: "ذُكِرَ خُلُقُ القناعةِ في كتابِ اللهِ وسنةِ رسولِهِ صلى الله عليه وسلم", answer: true },
-    { text: "القناعةُ هي الرضا بما أعطى اللهُ", answer: true },
-    { text: "القناعةُ سببٌ لنيلِ محبةِ اللهِ", answer: true },
-    { text: "القناعةُ علامةٌ على نقصِ الإيمانِ", answer: false },
-    { text: "القناعةُ طريقٌ موصلٌ إلى الجنةِ", answer: true },
-    { text: "القناعةُ تجعلك تعيشُ حياةً هنيئةً طيبةً", answer: true },
-    { text: "القناعةُ هي النظرُ فيما عند الناسِ", answer: false },
-    { text: "القناعةُ تُكْسِبُ صاحبَها غِنى النفسِ", answer: true },
-    { text: "القناعةُ تحقيقٌ لشكرِ اللهِ تعالى على نِعَمِهِ", answer: true }
+    { type: 'tf', text: "تعلَّمتُ أسماءَ اللهِ الحسنى من القرآنِ فقط", answer: false },
+    { type: 'tf', text: "كلُّ اسمٍ من أسماءِ اللهِ يدلُّ على صفةٍ", answer: true },
+    { type: 'tf', text: "ذُكر اسمُ اللهِ المهيمنِ في القرآنِ مرةً واحدةً", answer: true },
+    { type: 'tf', text: "المهيمنُ الذي لا ينقصُ للمطيعينَ يومَ الحسابِ من أعمالِهم شيئًا", answer: true },
+    { type: 'tf', text: "اسمُ اللهِ المهيمنِ يأتي بمعنى الشاهدِ أو الرقيبِ أو المؤتمنِ", answer: true },
+    { type: 'tf', text: "إذا علمتَ أنَّ اللهَ شاهدٌ عليكَ، فأحسِنِ المراقبةَ", answer: true },
+    { type: 'tf', text: "لا تشكُ اللهَ لعبادِه، بل ارضَ بقدرِه", answer: true },
+    { type: 'tf', text: "إذا كنتَ مهيمنًا على أصدقائِك، أتعلَّمُ الغناءَ علشانَ يقلِّدوني؟", answer: false },
+
+    { type: 'mc',
+      text: "تعلُّمُ أسماءِ اللهِ الحسنى له أهميةٌ عظيمةٌ، منها:",
+      options: ["التعرُّف على الله، فنحبُّه ونطيع أوامرَه", "تعظيم اللهِ وخشيتُه", "الدعاءُ بأسماءِ اللهِ عز وجل", "جميعُ ما سبق"],
+      correct: 3
+    },
+    { type: 'mc',
+      text: "اسمُ اللهِ المهيمنِ جاء في سورةِ:",
+      options: ["المجادلة", "الحشر"],
+      correct: 1
+    },
+    { type: 'mc',
+      text: "معنى المهيمنِ في اللغةِ: أي القائمُ على الشيءِ بالتدبيرِ",
+      options: ["صح", "خطأ"],
+      correct: 0
+    },
+    { type: 'mc',
+      text: "معنى اسمِ المهيمنِ في حقِّ اللهِ:",
+      options: ["الأمينُ الذي لا ينقصُ الحسناتِ ولا يضاعِفُ السيئاتِ", "ما كان على الأسرارِ رقيبًا، ومن الأرواحِ قريبًا", "الشهيدُ والحافظُ والعليمُ والقادرُ", "جميعُ ما سبق"],
+      correct: 3
+    },
+    { type: 'mc',
+      text: "يتجلّى اسمُ اللهِ المهيمنِ في قصةِ موسى عليه السلام:",
+      options: ["هيمن اللهُ على قلبِ أمِّ موسى بالسكينةِ حين ألقت وليدَها في اليمِّ", "هيمن على قلبِ امرأةِ فرعونَ، وقذف في قلبِها محبتَه", "هيمن على قلبِ وعقلِ فرعونَ الذي تجبَّر في الأرضِ، فأطاع أمرَ زوجتِه", "جميعُ ما سبق"],
+      correct: 3
+    },
+    { type: 'mc',
+      text: "إذا ملك الإنسانُ أسبابَ الدنيا كلَّها، استطاع أن يهيمنَ على آخرَ",
+      options: ["صح", "خطأ"],
+      correct: 1
+    },
+    { type: 'mc',
+      text: "أُصاحِبُ صاحبَ حسنِ الأخلاقِ، ولا أصاحبُ سيئَ الأخلاقِ",
+      options: ["صح", "خطأ"],
+      correct: 0
+    },
+    { type: 'mc',
+      text: "عرفنا أنَّ اللهَ المهيمنَ عليمٌ مطَّلعٌ على ما في قلوبِنا، لذلك علينا أن:",
+      options: ["نطهِّرَ قلوبَنا، ونجاهدَ أنفسَنا على طاعةِ اللهِ", "لا نهتمَّ ولا نبالي"],
+      correct: 0
+    },
+    { type: 'mc',
+      text: "إذا رزقك اللهُ قوةً شخصيةً وشيئًا من الهيمنةِ، وكنتَ مؤثرًا فيمن حولَك:",
+      options: ["فاحذر أن تكونَ مهيمنًا وأنت على معصيةٍ", "احرص على أن تكونَ قدوةً حسنةً لمن حولَك", "جميعُ ما سبق"],
+      correct: 2
+    }
   ];
 
   const arabicDigits = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
@@ -508,15 +577,40 @@
     fb.className = 'feedback';
     fb.textContent = '';
 
-    const btnTrue = document.getElementById('btnTrue');
-    const btnFalse = document.getElementById('btnFalse');
-    btnTrue.disabled = false;
-    btnFalse.disabled = false;
-    btnTrue.classList.remove('picked');
-    btnFalse.classList.remove('picked');
+    const tfRow = document.getElementById('tfRow');
+    const mcOptions = document.getElementById('mcOptions');
+    const qLabel = document.getElementById('qLabel');
+
+    if(q.type === 'tf'){
+      qLabel.textContent = 'هل هذه العبارة صحيحة؟';
+      tfRow.style.display = 'flex';
+      mcOptions.style.display = 'none';
+      mcOptions.innerHTML = '';
+
+      const btnTrue = document.getElementById('btnTrue');
+      const btnFalse = document.getElementById('btnFalse');
+      btnTrue.disabled = false;
+      btnFalse.disabled = false;
+      btnTrue.classList.remove('picked');
+      btnFalse.classList.remove('picked');
+    } else {
+      qLabel.textContent = 'اختاري الإجابة الصحيحة:';
+      tfRow.style.display = 'none';
+      mcOptions.style.display = 'flex';
+      mcOptions.innerHTML = '';
+
+      const bullets = ['أ','ب','ج','د','هـ'];
+      q.options.forEach((optText, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'mc-option';
+        btn.setAttribute('onclick', 'answerMC(' + idx + ')');
+        btn.innerHTML = '<span class="opt-bullet">' + bullets[idx] + '</span><span>' + optText + '</span>';
+        mcOptions.appendChild(btn);
+      });
+    }
   }
 
-  function answer(userAnswer){
+  function answerTF(userAnswer){
     if(locked) return;
     locked = true;
     playClick();
@@ -531,6 +625,32 @@
     btnFalse.disabled = true;
     (userAnswer ? btnTrue : btnFalse).classList.add('picked');
 
+    showFeedback(correct);
+    advanceAfterDelay();
+  }
+
+  function answerMC(selectedIndex){
+    if(locked) return;
+    locked = true;
+    playClick();
+
+    const q = questions[currentIndex];
+    const correct = selectedIndex === q.correct;
+    if(correct) score++;
+
+    const optionButtons = document.querySelectorAll('#mcOptions .mc-option');
+    optionButtons.forEach((btn, idx) => {
+      btn.disabled = true;
+      if(idx === q.correct){ btn.classList.add('correct'); }
+      else if(idx === selectedIndex){ btn.classList.add('wrong'); }
+      else { btn.classList.add('dim'); }
+    });
+
+    showFeedback(correct);
+    advanceAfterDelay();
+  }
+
+  function showFeedback(correct){
     const fb = document.getElementById('feedback');
     fb.textContent = correct ? '✅ إجابة صحيحة، أحسنت!' : '❌ إجابة غير صحيحة';
     fb.className = 'feedback show ' + (correct ? 'correct' : 'wrong');
@@ -542,7 +662,9 @@
 
     document.getElementById('progressBar').style.width =
       ((currentIndex + 1) / questions.length * 100) + '%';
+  }
 
+  function advanceAfterDelay(){
     setTimeout(() => {
       currentIndex++;
       if(currentIndex < questions.length){
@@ -550,7 +672,7 @@
       } else {
         showResult();
       }
-    }, 1100);
+    }, 1400);
   }
 
   function showResult(){
