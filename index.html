@@ -1,733 +1,594 @@
+```html
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ألعاب مفيدة | أكاديمية هداية الدولية للناشئين</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Lalezar&family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>قطار الأسئلة التفاعلية - دعاء الاستعاذة</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Cairo) -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
-<style>
-  :root{
-    --cream: #FFF6E1;
-    --cream-2: #FFEFC7;
-    --sun-yellow: #FFC93C;
-    --sun-orange: #FF9F1C;
-    --turquoise: #14B8A6;
-    --turquoise-dark: #0E8E7E;
-    --sky-blue: #3DB8E0;
-    --coral: #FF6B6B;
-    --coral-dark: #E1483F;
-    --navy: #123350;
-    --navy-soft: #285678;
-    --purple: #7B61FF;
-    --shadow: 0 10px 0 rgba(18,51,80,0.12);
-  }
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: {
+                            dark: '#0B192C',
+                            DEFAULT: '#1E3E62',
+                            light: '#2D5584'
+                        },
+                        gold: {
+                            DEFAULT: '#FFD700',
+                            dark: '#D4AF37',
+                            light: '#FFF099'
+                        },
+                        sky: {
+                            DEFAULT: '#80C4E9',
+                            light: '#E1F5FE'
+                        }
+                    },
+                    fontFamily: {
+                        cairo: ['Cairo', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
 
-  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    <style>
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(180deg, #0B192C 0%, #1E3E62 100%);
+            touch-action: manipulation;
+        }
 
-  html,body{
-    margin:0; padding:0; height:100%;
-    background: linear-gradient(180deg, var(--cream) 0%, var(--cream-2) 60%, #FFE3A8 100%);
-    font-family:'Cairo', sans-serif;
-    color:var(--navy);
-    overflow-x:hidden;
-  }
+        /* Hide Scrollbar for clean mobile look */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
 
-  button{ font-family:inherit; border:none; cursor:pointer; background:none; color:inherit; }
+        /* Shake animation for wrong answer */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+        .shake-err {
+            animation: shake 0.4s ease-in-out;
+            border-color: #EF4444 !important;
+        }
 
-  /* ===================== BACKGROUND DECOR ===================== */
-  .bg-decor{
-    position:fixed; inset:0; z-index:0; overflow:hidden; pointer-events:none;
-  }
-  .cloud{
-    position:absolute; opacity:.85; font-size:2.6rem; filter:drop-shadow(0 4px 0 rgba(255,255,255,.4));
-    animation: floatCloud linear infinite;
-  }
-  .cloud.c1{ top:8%; animation-duration:38s; }
-  .cloud.c2{ top:18%; animation-duration:52s; font-size:2rem; animation-delay:-10s;}
-  .cloud.c3{ top:6%; animation-duration:46s; font-size:1.6rem; animation-delay:-25s;}
-  @keyframes floatCloud{
-    from{ transform:translateX(-15vw); }
-    to{ transform:translateX(115vw); }
-  }
-  .wave{
-    position:absolute; bottom:0; left:0; width:100%; height:14vh; min-height:70px;
-    background: repeating-linear-gradient(90deg, var(--turquoise) 0 40px, var(--turquoise-dark) 40px 80px);
-    clip-path: polygon(0 40%, 5% 30%, 10% 40%, 15% 30%, 20% 40%, 25% 30%, 30% 40%, 35% 30%, 40% 40%, 45% 30%, 50% 40%, 55% 30%, 60% 40%, 65% 30%, 70% 40%, 75% 30%, 80% 40%, 85% 30%, 90% 40%, 95% 30%, 100% 40%, 100% 100%, 0 100%);
-    opacity:.35;
-  }
+        /* Train animation smoothness */
+        .train-wrapper {
+            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
 
-  /* ===================== SCREENS ===================== */
-  .screen{ display:none; min-height:100dvh; position:relative; z-index:1; }
-  .screen.active{ display:flex; flex-direction:column; }
+        /* Wheel Rotation */
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .wheel-spinning {
+            animation: spin 0.5s linear infinite;
+        }
 
-  /* ===================== HOME ===================== */
-  #home-screen{ align-items:center; padding: env(safe-area-inset-top,0) 1rem 3rem; }
-
-  .hero{
-    width:100%; max-width:640px; text-align:center;
-    padding-top: clamp(1.2rem, 4vh, 2.5rem);
-  }
-
-  .sun-svg{ width: clamp(120px,28vw,180px); height:auto; }
-  .rays{ transform-origin:100px 100px; animation:spin 50s linear infinite; }
-  @keyframes spin{ to{ transform:rotate(360deg); } }
-  @keyframes bob{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(-8px);} }
-  .sun-wrap{ animation:bob 4.5s ease-in-out infinite; display:inline-block; }
-
-  .site-title{
-    font-family:'Lalezar', sans-serif;
-    font-size: clamp(2.6rem, 9vw, 4.2rem);
-    margin: .2rem 0 0;
-    background: linear-gradient(180deg, var(--sun-orange), var(--coral-dark));
-    -webkit-background-clip:text; background-clip:text; color:transparent;
-    letter-spacing:1px;
-    line-height:1.1;
-    text-shadow: 0 2px 0 rgba(255,255,255,.4);
-  }
-  .site-subtitle{
-    font-weight:800; font-size:clamp(1.05rem, 3.4vw, 1.4rem);
-    color:var(--navy); margin:.5rem 0 0; opacity:.92;
-  }
-
-  .games-grid{
-    width:100%; max-width:640px; margin-top: clamp(1.5rem,4vh,2.5rem);
-    display:grid; grid-template-columns:1fr; gap:1.1rem;
-  }
-  @media (min-width:640px){
-    .games-grid{ grid-template-columns:1fr 1fr; }
-    .games-grid .active-card{ grid-column: 1 / -1; }
-  }
-
-  .game-card{
-    position:relative; border-radius:28px; padding:1.6rem 1.4rem 1.5rem;
-    text-align:center; display:flex; flex-direction:column; align-items:center; gap:.35rem;
-    min-height:150px; justify-content:center;
-    box-shadow: var(--shadow);
-    transition: transform .15s ease, box-shadow .15s ease;
-    border: 3px solid rgba(255,255,255,.55);
-  }
-  .game-card:active{ transform: translateY(6px); box-shadow:0 4px 0 rgba(18,51,80,.12); }
-
-  .active-card{
-    background: linear-gradient(150deg, var(--turquoise) 0%, var(--sky-blue) 100%);
-    color:#fff;
-    min-height:190px;
-  }
-  .card-icon{ font-size:2.6rem; filter:drop-shadow(0 3px 0 rgba(0,0,0,.12)); }
-  .active-card h2{ font-family:'Lalezar', sans-serif; font-size:1.7rem; margin:.1rem 0; letter-spacing:.5px; }
-  .active-card p{ margin:0; font-weight:700; opacity:.95; font-size:.95rem; }
-  .card-count{
-    background:rgba(255,255,255,.25); padding:.25rem .9rem; border-radius:999px;
-    font-size:.85rem; font-weight:800; margin-top:.2rem;
-  }
-  .play-btn{
-    margin-top:.6rem; background:#fff; color:var(--turquoise-dark);
-    font-weight:900; padding:.85rem 2rem; border-radius:999px; font-size:1.05rem;
-    box-shadow:0 5px 0 rgba(0,0,0,.12);
-  }
-
-  .soon-card{
-    background: linear-gradient(150deg, #FFF, var(--cream-2));
-    color:var(--navy-soft); opacity:.85;
-  }
-  .soon-card h2{ font-family:'Lalezar', sans-serif; font-size:1.3rem; margin:.1rem 0; }
-  .soon-badge{
-    background: rgba(123,97,255,.12); color:var(--purple);
-    font-weight:800; font-size:.8rem; padding:.3rem .8rem; border-radius:999px;
-  }
-
-  /* ===================== GAME SCREEN ===================== */
-  #game-screen{
-    background: linear-gradient(180deg, var(--turquoise-dark), var(--turquoise) 40%, #22C4B0 100%);
-    color:#fff; min-height:100dvh; padding: max(env(safe-area-inset-top,0),1rem) 1rem calc(env(safe-area-inset-bottom,0) + 1rem);
-  }
-  .game-header{
-    display:flex; align-items:center; gap:.8rem; width:100%; max-width:640px; margin:0 auto;
-  }
-  .back-btn{
-    background:rgba(255,255,255,.2); font-weight:800; padding:.6rem 1rem; border-radius:999px;
-    font-size:.95rem; flex-shrink:0;
-  }
-  .progress-wrap{
-    flex:1; background:rgba(255,255,255,.25); border-radius:999px; height:14px; overflow:hidden;
-  }
-  .progress-bar{ height:100%; width:0%; background:var(--sun-yellow); border-radius:999px; transition:width .35s ease; }
-  .question-counter{ font-weight:900; font-size:.95rem; flex-shrink:0; min-width:52px; text-align:left; }
-
-  .question-area{
-    flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
-    width:100%; max-width:640px; margin:0 auto; padding: 1.5rem 0; gap:1rem; position:relative;
-  }
-  .q-card{
-    background:#fff; color:var(--navy); border-radius:28px; padding: 2rem 1.6rem;
-    width:100%; text-align:center; box-shadow:0 10px 0 rgba(0,0,0,.12);
-    display:flex; flex-direction:column; gap:.8rem; min-height:180px; justify-content:center;
-    position:relative; overflow:visible;
-  }
-  .sparkle-layer{ position:absolute; inset:0; pointer-events:none; overflow:visible; z-index:5; }
-  .sparkle{
-    position:absolute; font-size:1.5rem; opacity:0;
-    animation: sparklePop .9s ease-out forwards;
-  }
-  @keyframes sparklePop{
-    0%{ transform:scale(0) translateY(0) rotate(0deg); opacity:0; }
-    25%{ opacity:1; transform:scale(1.3) translateY(-14px) rotate(15deg); }
-    100%{ transform:scale(.5) translateY(-70px) rotate(60deg); opacity:0; }
-  }
-  .q-label{ font-weight:800; color:var(--sun-orange); font-size:.95rem; }
-  .q-text{
-    font-family:'Lalezar', sans-serif; font-size: clamp(1.35rem, 5vw, 1.9rem);
-    line-height:1.6; margin:0; color:var(--navy);
-  }
-  .feedback{
-    font-weight:900; font-size:1.3rem; min-height:2.2rem; display:flex; align-items:center; gap:.5rem;
-    opacity:0; transform:translateY(6px); transition:opacity .25s ease, transform .25s ease;
-  }
-  .feedback.show{ opacity:1; transform:translateY(0); }
-  .feedback.correct{ color:#fff; }
-  .feedback.wrong{ color:#FFE1E1; }
-
-  .answers-row{
-    display:flex; gap:1rem; width:100%; max-width:640px; margin:0 auto; padding-bottom:.5rem;
-  }
-  .ans-btn{
-    flex:1; padding:1.3rem .5rem; border-radius:24px; font-size:1.35rem; font-weight:900;
-    display:flex; flex-direction:column; align-items:center; gap:.2rem;
-    box-shadow:0 7px 0 rgba(0,0,0,.18);
-    transition: transform .1s ease, box-shadow .1s ease;
-    min-height:78px;
-  }
-  .ans-btn:active{ transform:translateY(6px); box-shadow:0 1px 0 rgba(0,0,0,.18); }
-  .ans-btn span{ font-size:1.1rem; }
-  .true-btn{ background: linear-gradient(180deg, #3FDC9A, #1FAF74); color:#fff; }
-  .false-btn{ background: linear-gradient(180deg, var(--coral), var(--coral-dark)); color:#fff; }
-  .ans-btn:disabled{ opacity:.55; pointer-events:none; }
-  .ans-btn.picked{ outline:5px solid rgba(255,255,255,.85); }
-
-  .mc-options{
-    display:flex; flex-direction:column; gap:.7rem; width:100%; max-width:640px;
-    margin:0 auto; padding-bottom:1rem;
-  }
-  .mc-option{
-    background:#fff; color:var(--navy); border-radius:18px; padding:.9rem 1.1rem;
-    font-weight:800; font-size:1.02rem; text-align:right; display:flex; align-items:center; gap:.7rem;
-    box-shadow:0 5px 0 rgba(0,0,0,.14); transition:transform .1s ease, box-shadow .1s ease;
-    min-height:56px; line-height:1.5; width:100%;
-  }
-  .mc-option:active{ transform:translateY(4px); box-shadow:0 1px 0 rgba(0,0,0,.14); }
-  .mc-option .opt-bullet{
-    flex-shrink:0; width:30px; height:30px; border-radius:50%; background:var(--cream-2); color:var(--navy-soft);
-    display:flex; align-items:center; justify-content:center; font-weight:900; font-size:.95rem;
-  }
-  .mc-option.correct{ background: linear-gradient(180deg, #3FDC9A, #1FAF74); color:#fff; }
-  .mc-option.correct .opt-bullet{ background:rgba(255,255,255,.3); color:#fff; }
-  .mc-option.wrong{ background: linear-gradient(180deg, var(--coral), var(--coral-dark)); color:#fff; }
-  .mc-option.wrong .opt-bullet{ background:rgba(255,255,255,.3); color:#fff; }
-  .mc-option.dim{ opacity:.55; }
-  .mc-option:disabled{ pointer-events:none; }
-
-  /* ===================== RESULT SCREEN ===================== */
-  #result-screen{
-    align-items:center; justify-content:center; min-height:100dvh; padding:2rem 1rem; position:relative;
-    background: radial-gradient(circle at 50% 20%, #FFEFC0, var(--cream) 65%);
-  }
-  .result-card{
-    background:#fff; border-radius:32px; padding:2.3rem 1.8rem; text-align:center;
-    max-width:420px; width:100%; box-shadow:0 12px 0 rgba(18,51,80,.12); position:relative; z-index:2;
-  }
-  .result-emoji{ font-size:4rem; margin-bottom:.3rem; }
-  .result-card h2{ font-family:'Lalezar', sans-serif; font-size:2.1rem; color:var(--sun-orange); margin:.2rem 0; }
-  .result-card p{ font-weight:800; font-size:1.15rem; color:var(--navy); margin:.3rem 0 1rem; }
-  .stars{ font-size:2rem; margin-bottom:1.2rem; letter-spacing:.3rem; }
-  .result-btns{ display:flex; flex-direction:column; gap:.8rem; }
-  .retry-btn, .home-btn{
-    padding:1rem; border-radius:999px; font-weight:900; font-size:1.05rem;
-    box-shadow:0 6px 0 rgba(0,0,0,.14);
-  }
-  .retry-btn{ background: linear-gradient(180deg, var(--sun-yellow), var(--sun-orange)); color:var(--navy); }
-  .home-btn{ background: linear-gradient(180deg, var(--turquoise), var(--turquoise-dark)); color:#fff; }
-  .retry-btn:active, .home-btn:active{ transform:translateY(5px); box-shadow:0 1px 0 rgba(0,0,0,.14); }
-
-  .confetti-layer{ position:absolute; inset:0; overflow:hidden; pointer-events:none; z-index:1; }
-  .confetti-piece{
-    position:absolute; top:-10%; font-size:1.4rem; animation: fall linear forwards;
-  }
-  @keyframes fall{
-    to{ transform: translateY(115vh) rotate(400deg); opacity:.9; }
-  }
-
-  /* ===================== TOAST ===================== */
-  .toast{
-    position:fixed; bottom:calc(env(safe-area-inset-bottom,0) + 1.4rem); left:50%; transform:translateX(-50%) translateY(20px);
-    background:var(--navy); color:#fff; font-weight:800; padding:.9rem 1.6rem; border-radius:999px;
-    box-shadow:0 6px 20px rgba(0,0,0,.25); opacity:0; transition:opacity .25s ease, transform .25s ease;
-    z-index:50; font-size:.95rem; pointer-events:none; white-space:nowrap;
-  }
-  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
-
-  @media (max-width:360px){
-    .site-title{ font-size:2.3rem; }
-  }
-</style>
+        /* Glow Effect for active car */
+        .active-car {
+            box-shadow: 0 0 12px #FFD700;
+            border-color: #FFD700 !important;
+            transform: scale(1.03);
+        }
+    </style>
 </head>
-<body>
+<body class="min-h-screen max-w-md mx-auto text-white flex flex-col justify-between select-none relative shadow-2xl border-x border-gold/20">
 
-<div class="bg-decor" aria-hidden="true">
-  <div class="cloud c1">☁️</div>
-  <div class="cloud c2">☁️</div>
-  <div class="cloud c3">☁️</div>
-  <div class="wave"></div>
-</div>
+    <!-- 1. LOGIN MODAL OVERLAY (MOBILE OPTIMIZED) -->
+    <div id="login-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-navy-dark/95 backdrop-blur-md p-4 max-w-md mx-auto">
+        <div class="bg-navy p-6 rounded-3xl border-2 border-gold w-full text-center shadow-2xl relative">
+            
+            <div class="w-16 h-16 bg-gold/20 rounded-full flex items-center justify-center mx-auto mb-3 border-2 border-gold text-gold text-2xl">
+                <i class="fa-solid fa-train"></i>
+            </div>
 
-<!-- ===================== HOME SCREEN ===================== -->
-<section id="home-screen" class="screen active">
-  <div class="hero">
-    <div class="sun-wrap">
-      <svg class="sun-svg" viewBox="0 0 200 200" aria-hidden="true">
-        <defs>
-          <radialGradient id="sunGrad" cx="40%" cy="35%" r="65%">
-            <stop offset="0%" stop-color="#FFEE9C"/>
-            <stop offset="55%" stop-color="#FFC93C"/>
-            <stop offset="100%" stop-color="#FF9F1C"/>
-          </radialGradient>
-        </defs>
-        <g class="rays" stroke="#FF9F1C" stroke-width="9" stroke-linecap="round">
-          <line x1="100" y1="10" x2="100" y2="32"/>
-          <line x1="100" y1="168" x2="100" y2="190"/>
-          <line x1="10" y1="100" x2="32" y2="100"/>
-          <line x1="168" y1="100" x2="190" y2="100"/>
-          <line x1="38" y1="38" x2="53" y2="53"/>
-          <line x1="147" y1="147" x2="162" y2="162"/>
-          <line x1="162" y1="38" x2="147" y2="53"/>
-          <line x1="53" y1="147" x2="38" y2="162"/>
-        </g>
-        <circle cx="100" cy="100" r="56" fill="url(#sunGrad)" stroke="#FF9F1C" stroke-width="3"/>
-        <circle cx="82" cy="92" r="6" fill="#123350"/>
-        <circle cx="118" cy="92" r="6" fill="#123350"/>
-        <path d="M78 116 Q100 138 122 116" stroke="#123350" stroke-width="6" fill="none" stroke-linecap="round"/>
-        <circle cx="70" cy="112" r="7" fill="#FF6B6B" opacity=".55"/>
-        <circle cx="130" cy="112" r="7" fill="#FF6B6B" opacity=".55"/>
-      </svg>
+            <h1 class="text-2xl font-black text-gold mb-1">قطار الأسئلة التفاعلية</h1>
+            <p class="text-sky mb-4 text-xs font-bold leading-relaxed bg-navy-dark/60 p-2 rounded-xl border border-sky/30">
+                حديث: "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنْ زَوَالِ نِعْمَتِكَ وَتَحَوُّلِ عَافِيَتِكَ..."
+            </p>
+
+            <div class="space-y-3 text-right">
+                <label for="student-name" class="block text-xs font-bold text-gray-200">أدخل اسم الطالب/الطالبة للبدء:</label>
+                <input type="text" id="student-name" placeholder="اكتب الاسم هنا..." 
+                    class="w-full px-4 py-3 rounded-xl bg-navy-dark border-2 border-sky text-white text-base focus:outline-none focus:border-gold text-center font-bold">
+                <p id="login-error" class="text-red-400 text-xs hidden font-bold text-center">
+                    <i class="fa-solid fa-triangle-exclamation"></i> يرجى إدخال الاسم أولاً!
+                </p>
+            </div>
+
+            <button onclick="startGame()" class="w-full mt-5 bg-gold active:bg-gold-dark text-navy-dark font-black text-lg py-3.5 rounded-xl shadow-lg flex items-center justify-center gap-2">
+                <span>انطلاق اللعبة</span>
+                <i class="fa-solid fa-circle-play"></i>
+            </button>
+        </div>
     </div>
-    <h1 class="site-title">ألعاب مفيدة</h1>
-    <p class="site-subtitle">مع أكاديمية هداية الدولية للناشئين</p>
-  </div>
 
-  <main class="games-grid">
-    <button class="game-card active-card" onclick="openGame()">
-      <span class="card-icon">🌟</span>
-      <h2> اسم الله المهيمن </h2>
-      <p>ضع علامة ✅ أو ❎، واختر الإجابة الصحيحة</p>
-      <span class="card-count">١٧ سؤالًا</span>
-      <span class="play-btn">ابدأ اللعبة</span>
-    </button>
-  </main>
-</section>
+    <!-- MAIN GAME HEADER -->
+    <header class="bg-navy/90 border-b border-gold/30 p-3 sticky top-0 z-30 backdrop-blur-md">
+        <div class="flex justify-between items-center gap-2">
+            <!-- Student Info Display -->
+            <div class="flex items-center gap-2 bg-navy-dark px-3 py-1.5 rounded-xl border border-gold/40 max-w-[170px]">
+                <div class="w-7 h-7 rounded-full bg-gold flex items-center justify-center text-navy-dark font-bold text-xs shrink-0">
+                    <i class="fa-solid fa-user-graduate"></i>
+                </div>
+                <div class="truncate">
+                    <span class="text-[10px] text-sky block leading-none">البطل</span>
+                    <span id="player-display-name" class="text-xs font-black text-gold truncate block">----</span>
+                </div>
+            </div>
 
-<!-- ===================== GAME SCREEN ===================== -->
-<section id="game-screen" class="screen">
-  <div class="game-header">
-    <button class="back-btn" onclick="goHome()">رجوع ➜</button>
-    <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
-    <span class="question-counter" id="questionCounter">١ / ٩</span>
-  </div>
+            <!-- Score & Sound -->
+            <div class="flex items-center gap-2">
+                <div class="bg-navy-dark px-3 py-1.5 rounded-xl border border-sky/40 text-center">
+                    <span class="text-[10px] text-sky block leading-none">النقاط</span>
+                    <span id="score-display" class="text-sm font-black text-gold">0 / 16</span>
+                </div>
+                <button onclick="toggleAudio()" id="audio-btn" class="w-9 h-9 bg-navy-dark border border-gold/40 rounded-xl text-gold active:scale-95 flex items-center justify-center text-sm">
+                    <i class="fa-solid fa-volume-high"></i>
+                </button>
+            </div>
+        </div>
+    </header>
 
-  <div class="question-area">
-    <div class="q-card">
-      <span class="q-label" id="qLabel">هل هذه العبارة صحيحة؟</span>
-      <p class="q-text" id="qText"></p>
-      <div class="sparkle-layer" id="sparkleLayer"></div>
+    <!-- MAIN GAME AREA -->
+    <main class="flex-1 p-3 flex flex-col gap-3 justify-between">
+
+        <!-- TRAIN TRACK DISPLAY -->
+        <section class="bg-navy-dark/70 rounded-2xl p-2.5 border border-gold/30 shadow-md relative overflow-hidden">
+            <div class="flex justify-between items-center mb-1.5 px-1">
+                <span class="text-[11px] font-bold text-sky"><i class="fa-solid fa-route"></i> مسار القطار</span>
+                <span id="train-status" class="text-[11px] font-bold text-gold">السؤال 1 من 16</span>
+            </div>
+
+            <!-- Train Scroll Track -->
+            <div id="track-scroll" class="no-scrollbar overflow-x-auto pb-3 pt-1 px-1 relative scroll-smooth">
+                <!-- Rails -->
+                <div class="absolute bottom-6 left-0 right-0 h-2 bg-gray-600 rounded-full border-t border-gray-400"></div>
+
+                <!-- Train Assembly Wrapper -->
+                <div id="train-assembly" class="train-wrapper flex items-end gap-1.5 relative min-w-max">
+                    
+                    <!-- ENGINE -->
+                    <div class="relative flex flex-col items-center z-20 shrink-0">
+                        <div class="w-24 h-20 bg-gradient-to-t from-red-800 to-red-600 rounded-t-2xl border-2 border-gold flex flex-col justify-between p-1 shadow-md relative">
+                            <!-- Chimney -->
+                            <div class="absolute -top-4 right-2 w-4 h-5 bg-gray-800 border border-gold rounded-t-sm flex items-center justify-center">
+                                <div class="w-1.5 h-1.5 bg-gray-300 rounded-full animate-ping"></div>
+                            </div>
+                            <div class="flex justify-center items-center bg-sky-light/20 py-0.5 rounded border border-gold/40">
+                                <span class="text-[9px] font-black text-gold">القطار</span>
+                            </div>
+                            <div class="flex justify-between items-center mt-1 px-1">
+                                <div class="w-2.5 h-2.5 bg-yellow-300 rounded-full animate-pulse shadow-[0_0_8px_#FFD700]"></div>
+                                <i class="fa-solid fa-train text-xs text-white"></i>
+                            </div>
+                        </div>
+                        <!-- Engine Wheels -->
+                        <div class="flex gap-1 -mt-2 z-10">
+                            <div class="wheel w-6 h-6 rounded-full bg-gray-900 border-2 border-gold flex items-center justify-center">
+                                <div class="w-1 h-1 bg-white rounded-full"></div>
+                            </div>
+                            <div class="wheel w-6 h-6 rounded-full bg-gray-900 border-2 border-gold flex items-center justify-center">
+                                <div class="w-1 h-1 bg-white rounded-full"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CARS CONTAINER -->
+                    <div id="train-cars-container" class="flex items-end gap-2"></div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- QUESTION CARD -->
+        <section class="bg-navy p-4 rounded-2xl border-2 border-gold/40 shadow-lg flex flex-col justify-between my-auto">
+            <div class="flex justify-between items-center mb-2 border-b border-white/10 pb-2">
+                <span id="question-badge" class="bg-gold text-navy-dark px-3 py-0.5 rounded-full font-black text-xs flex items-center gap-1">
+                    <i class="fa-solid fa-circle-question"></i> السؤال رقم 1
+                </span>
+                <span class="text-[10px] text-sky font-semibold"><i class="fa-solid fa-hand-pointer"></i> انقر الإجابة الصحيحة</span>
+            </div>
+
+            <!-- Question Text -->
+            <div class="my-3 min-h-[70px] flex items-center">
+                <h3 id="question-text" class="text-base font-bold text-white leading-relaxed text-right w-full">
+                    جاري تحميل السؤال...
+                </h3>
+            </div>
+        </section>
+
+        <!-- OPTIONS AREA (TAP TO CHOOSE) -->
+        <section class="space-y-2">
+            <h4 class="text-xs font-bold text-gold mb-1 flex items-center gap-1">
+                <i class="fa-solid fa-list-ul"></i> اختر الإجابة المناسبة للعربة:
+            </h4>
+            
+            <div id="options-container" class="space-y-2">
+                <!-- Options populated by JS -->
+            </div>
+
+            <!-- Feedback Message -->
+            <div id="feedback-box" class="p-2.5 rounded-xl text-center font-bold text-sm hidden transition-all">
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-navy-dark border-t border-white/10 p-2 text-center text-[10px] text-sky">
+        <p>قطار الأسئلة التفاعلية - دعاء الاستعاذة من زوال النعمة © 2026</p>
+    </footer>
+
+    <!-- WIN CONGRATULATION MODAL WITH GIFT ICON -->
+    <div id="win-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-navy-dark/95 backdrop-blur-lg hidden p-4 max-w-md mx-auto">
+        <div class="bg-navy border-2 border-gold p-6 rounded-3xl w-full text-center shadow-2xl relative">
+            
+            <!-- GIFT ICON BOX -->
+            <div class="w-18 h-18 bg-gold/20 rounded-full border-2 border-gold flex items-center justify-center mx-auto mb-3 text-gold text-4xl animate-bounce p-4">
+                <i class="fa-solid fa-gift"></i>
+            </div>
+
+            <h2 class="text-2xl font-black text-gold mb-1">مُبَارَكٌ يَا بَطَلُ!</h2>
+            <p class="text-white text-sm mb-3">لقد أتممت الرحلة ووصل القطار إلى النهاية بنجاح!</p>
+            
+            <div class="bg-navy-dark/80 p-3 rounded-xl border border-sky/30 my-3 text-right space-y-1 text-xs">
+                <p class="text-sky">اسم المتسابق: <span id="win-student-name" class="font-bold text-gold"></span></p>
+                <p class="text-sky">النتيجة: <span id="win-score" class="font-bold text-gold">16 / 16</span></p>
+                <p class="text-sky">التقييم: <span class="font-bold text-emerald-400">ممتاز جداً 🌟</span></p>
+            </div>
+
+            <p class="text-gold font-bold text-xs mb-4">"أَحْسَنْتَ وَوَفَّقَكَ اللَّهُ دَائِمًا لِكُلِّ خَيْرٍ!"</p>
+
+            <button onclick="restartGame()" class="w-full bg-gold active:bg-gold-dark text-navy-dark font-black text-base py-3 rounded-xl shadow-lg flex items-center justify-center gap-2">
+                <span>إعادة اللعب</span>
+                <i class="fa-solid fa-rotate-right"></i>
+            </button>
+        </div>
     </div>
-    <div class="feedback" id="feedback"></div>
-  </div>
 
-  <div class="answers-row" id="tfRow">
-    <button class="ans-btn true-btn" id="btnTrue" onclick="answerTF(true)">
-      ✅ <span>صح</span>
-    </button>
-    <button class="ans-btn false-btn" id="btnFalse" onclick="answerTF(false)">
-      ❎ <span>خطأ</span>
-    </button>
-  </div>
+    <!-- SCRIPT LOGIC -->
+    <script>
+        /* NEW QUESTIONS DATABASE FOR THE HADITH & DUA */
+        const questionsData = [
+            // Section 1: True or False (9 Questions)
+            { id: 1, text: "استعاذ الرسول -صلى الله عليه وسلم- من أربعة أمور.", options: ["✅ صح", "❎ خطأ"], correct: "✅ صح" },
+            { id: 2, text: "زوال النعمة هو الذهاب الكلي للنعم.", options: ["✅ صح", "❎ خطأ"], correct: "✅ صح" },
+            { id: 3, text: "العافية هي السلامة من الأمراض والآفات في الدين والبدن.", options: ["✅ صح", "❎ خطأ"], correct: "✅ صح" },
+            { id: 4, text: "التحول هو عدم التغير والانتقال من حال إلى حال.", options: ["✅ صح", "❎ خطأ"], correct: "❎ خطأ" },
+            { id: 5, text: "يجب على المسلم أن يحافظ على هذا الدعاء لما فيه من خير الدنيا والآخرة.", options: ["✅ صح", "❎ خطأ"], correct: "✅ صح" },
+            { id: 6, text: "المحافظة على النعم تكون بشكرها.", options: ["✅ صح", "❎ خطأ"], correct: "✅ صح" },
+            { id: 7, text: "وجوب اللجوء إلى الله والافتقار إليه لدوام النعم والسلامة من النقم.", options: ["✅ صح", "❎ خطأ"], correct: "✅ صح" },
+            { id: 8, text: "سخط الله يعني رضاه عن العبد.", options: ["✅ صح", "❎ خطأ"], correct: "❎ خطأ" },
+            { id: 9, text: "سخط الله يأتي بالوقوع في المحرمات أو التقصير في الواجبات.", options: ["✅ صح", "❎ خطأ"], correct: "✅ صح" },
+            
+            // Section 2: Hadith & Vocabularies Multiple Choice (7 Questions)
+            { id: 10, text: "معنى «أعوذ بك» في الدعاء الشريف:", options: ["ألتجئ وأتحصن بالله وحده ليحميني مما أخاف وأحذر", "أتمنى ألا يحدث لي أي مكروه"], correct: "ألتجئ وأتحصن بالله وحده ليحميني مما أخاف وأحذر" },
+            { id: 11, text: "المقصود بـ «زوال النعمة»:", options: ["انتقال النعمة إلى شخص آخر", "فقدان وذهاب نعمة الله سواء الدينية أو الدنيوية"], correct: "فقدان وذهاب نعمة الله سواء الدينية أو الدنيوية" },
+            { id: 12, text: "معنى «تحول العافية»:", options: ["انقلاب الصحة والعافية إلى مرض وبلاء وشدة", "دوام الصحة والسلامة واستمرارها"], correct: "انقلاب الصحة والعافية إلى مرض وبلاء وشدة" },
+            { id: 13, text: "المقصود من قوله «فجأة نقمتك» أنه يستعيذ من:", options: ["عذاب الله وعقوبته التي تأتي بغتة دون إنذار مسبق", "الابتلاء الذي يصيب الإنسان فيرفع درجة العبد الصابر"], correct: "عذاب الله وعقوبته التي تأتي بغتة دون إنذار مسبق" },
+            { id: 14, text: "استعاذ النبي ﷺ من جميع ما يسخط الله عز وجل؛ لأنه سبحانه إذا سخط على العبد فقد هلك وخسر.", options: ["صح", "خطأ"], correct: "صح" },
+            { id: 15, text: "كيف تُحفظ النعم وتدوم للإنسان؟", options: ["بإخفاء النعم تمامًا عن أعين الناس وعدم إظهارها", "بشكر الله -سبحانه- المنعم بالقلب واللسان والجوارح واستخدامها في طاعة الله"], correct: "بشكر الله -سبحانه- المنعم بالقلب واللسان والجوارح واستخدامها في طاعة الله" },
+            { id: 16, text: "تعلمنا من دعاء النبي -صلى الله عليه وسلم-:", options: ["الافتقار والالتجاء إلى الله تعالى والاستعاذة به من كل ما نخاف منه", "الحرص على الابتعاد عن كل ما يغضب الله تعالى", "العافية بها صلاح الدين والدنيا", "جميع ما سبق"], correct: "جميع ما سبق" }
+        ];
 
-  <div class="mc-options" id="mcOptions"></div>
-</section>
+        const positivePhrases = [
+            "أَحْسَنْتَ يَا بَطَلُ! إِجَابَةٌ رَائِعَةٌ!",
+            "مُبْتَكِرٌ وَمُتَفَوِّقٌ! أَنْتَ تَتَقَدَّمُ!",
+            "مَاشَاءَ اللَّهُ! إِجَابَةٌ صَحِيحَةٌ!",
+            "رَائِعٌ جِدًّا! عَقْلُكَ الذَّكِيُّ يَنُورُ!",
+            "بَارَكَ اللَّهُ فِيكَ! خَطْوَةٌ مُوَفَّقَةٌ!",
+            "عَمَلٌ مُمَيَّزٌ! اسْتَمِرَّ فِي التَّأَلُّقِ!"
+        ];
 
-<!-- ===================== RESULT SCREEN ===================== -->
-<section id="result-screen" class="screen">
-  <div class="confetti-layer" id="confetti"></div>
-  <div class="result-card">
-    <div class="result-emoji" id="resultEmoji">🎉</div>
-    <h2 id="resultTitle">أحسنت!</h2>
-    <p id="resultScore">حصلت على ٩ من ٩</p>
-    <div class="stars" id="stars">⭐⭐⭐</div>
-    <div class="result-btns">
-      <button class="retry-btn" onclick="retryGame()">🔁 إعادة اللعب</button>
-      <button class="home-btn" onclick="goHome()">🏠 الرئيسية</button>
-    </div>
-  </div>
-</section>
+        let studentName = "";
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let audioMuted = false;
+        let audioCtx = null;
 
-<div class="toast" id="toast"></div>
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
 
-<script>
-  const questions = [
-    { type: 'tf', text: "تعلَّمتُ أسماءَ اللهِ الحسنى من القرآنِ فقط", answer: false },
-    { type: 'tf', text: "كلُّ اسمٍ من أسماءِ اللهِ يدلُّ على صفةٍ", answer: true },
-    { type: 'tf', text: "ذُكر اسمُ اللهِ المهيمنِ في القرآنِ مرةً واحدةً", answer: true },
-    { type: 'tf', text: "المهيمنُ الذي لا ينقصُ للمطيعينَ يومَ الحسابِ من أعمالِهم شيئًا", answer: true },
-    { type: 'tf', text: "اسمُ اللهِ المهيمنِ يأتي بمعنى الشاهدِ أو الرقيبِ أو المؤتمنِ", answer: true },
-    { type: 'tf', text: "إذا علمتَ أنَّ اللهَ شاهدٌ عليكَ، فأحسِنِ المراقبةَ", answer: true },
-    { type: 'tf', text: "لا تشكُ اللهَ لعبادِه، بل ارضَ بقدرِه", answer: true },
-    { type: 'tf', text: "إذا كنتَ مهيمنًا على أصدقائِك، أتعلَّمُ الغناءَ علشانَ يقلِّدوني؟", answer: false },
+        function playSound(type) {
+            if (audioMuted) return;
+            initAudio();
+            if (!audioCtx) return;
 
-    { type: 'mc',
-      text: "تعلُّمُ أسماءِ اللهِ الحسنى له أهميةٌ عظيمةٌ، منها:",
-      options: ["التعرُّف على الله، فنحبُّه ونطيع أوامرَه", "تعظيم اللهِ وخشيتُه", "الدعاءُ بأسماءِ اللهِ عز وجل", "جميعُ ما سبق"],
-      correct: 3
-    },
-    { type: 'mc',
-      text: "اسمُ اللهِ المهيمنِ جاء في سورةِ:",
-      options: ["المجادلة", "الحشر"],
-      correct: 1
-    },
-    { type: 'mc',
-      text: "معنى المهيمنِ في اللغةِ: أي القائمُ على الشيءِ بالتدبيرِ",
-      options: ["صح", "خطأ"],
-      correct: 0
-    },
-    { type: 'mc',
-      text: "معنى اسمِ المهيمنِ في حقِّ اللهِ:",
-      options: ["الأمينُ الذي لا ينقصُ الحسناتِ ولا يضاعِفُ السيئاتِ", "ما كان على الأسرارِ رقيبًا، ومن الأرواحِ قريبًا", "الشهيدُ والحافظُ والعليمُ والقادرُ", "جميعُ ما سبق"],
-      correct: 3
-    },
-    { type: 'mc',
-      text: "يتجلّى اسمُ اللهِ المهيمنِ في قصةِ موسى عليه السلام:",
-      options: ["هيمن اللهُ على قلبِ أمِّ موسى بالسكينةِ حين ألقت وليدَها في اليمِّ", "هيمن على قلبِ امرأةِ فرعونَ، وقذف في قلبِها محبتَه", "هيمن على قلبِ وعقلِ فرعونَ الذي تجبَّر في الأرضِ، فأطاع أمرَ زوجتِه", "جميعُ ما سبق"],
-      correct: 3
-    },
-    { type: 'mc',
-      text: "إذا ملك الإنسانُ أسبابَ الدنيا كلَّها، استطاع أن يهيمنَ على آخرَ",
-      options: ["صح", "خطأ"],
-      correct: 1
-    },
-    { type: 'mc',
-      text: "أُصاحِبُ صاحبَ حسنِ الأخلاقِ، ولا أصاحبُ سيئَ الأخلاقِ",
-      options: ["صح", "خطأ"],
-      correct: 0
-    },
-    { type: 'mc',
-      text: "عرفنا أنَّ اللهَ المهيمنَ عليمٌ مطَّلعٌ على ما في قلوبِنا، لذلك علينا أن:",
-      options: ["نطهِّرَ قلوبَنا، ونجاهدَ أنفسَنا على طاعةِ اللهِ", "لا نهتمَّ ولا نبالي"],
-      correct: 0
-    },
-    { type: 'mc',
-      text: "إذا رزقك اللهُ قوةً شخصيةً وشيئًا من الهيمنةِ، وكنتَ مؤثرًا فيمن حولَك:",
-      options: ["فاحذر أن تكونَ مهيمنًا وأنت على معصيةٍ", "احرص على أن تكونَ قدوةً حسنةً لمن حولَك", "جميعُ ما سبق"],
-      correct: 2
-    }
-  ];
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
 
-  const arabicDigits = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
-  function toArabicNum(n){
-    return String(n).split("").map(d => arabicDigits[+d] ?? d).join("");
-  }
+            const now = audioCtx.currentTime;
 
-  let currentIndex = 0;
-  let score = 0;
-  let locked = false;
+            if (type === 'correct') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(523.25, now);
+                osc.frequency.exponentialRampToValueAtTime(783.99, now + 0.2);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+                osc.start(now);
+                osc.stop(now + 0.4);
+            } else if (type === 'whistle') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(800, now);
+                osc.frequency.linearRampToValueAtTime(950, now + 0.1);
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'wrong') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(200, now);
+                osc.frequency.linearRampToValueAtTime(120, now + 0.25);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                osc.start(now);
+                osc.stop(now + 0.25);
+            }
+        }
 
-  /* ===================== SOUND ENGINE ===================== */
-  let audioCtx;
-  function getAudioCtx(){
-    if(!audioCtx){
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    }
-    if(audioCtx.state === 'suspended'){ audioCtx.resume(); }
-    return audioCtx;
-  }
+        function toggleAudio() {
+            audioMuted = !audioMuted;
+            const btn = document.getElementById('audio-btn');
+            if (audioMuted) {
+                btn.innerHTML = '<i class="fa-solid fa-volume-xmark"></i>';
+                btn.classList.add('text-red-400');
+            } else {
+                btn.innerHTML = '<i class="fa-solid fa-volume-high"></i>';
+                btn.classList.remove('text-red-400');
+            }
+        }
 
-  function playClick(){
-    try{
-      const ctx = getAudioCtx();
-      const o = ctx.createOscillator();
-      const g = ctx.createGain();
-      o.type = 'sine';
-      o.frequency.value = 520;
-      g.gain.setValueAtTime(0.001, ctx.currentTime);
-      g.gain.exponentialRampToValueAtTime(0.16, ctx.currentTime + 0.01);
-      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.09);
-      o.connect(g); g.connect(ctx.destination);
-      o.start(); o.stop(ctx.currentTime + 0.1);
-    }catch(e){}
-  }
+        function startGame() {
+            const input = document.getElementById('student-name');
+            const name = input.value.trim();
+            const errorMsg = document.getElementById('login-error');
 
-  function playCorrectSound(){
-    try{
-      const ctx = getAudioCtx();
-      const notes = [523.25, 659.25, 783.99, 1046.5]; // فرحة صاعدة
-      notes.forEach((freq, i) => {
-        const o = ctx.createOscillator();
-        const g = ctx.createGain();
-        o.type = 'triangle';
-        o.frequency.value = freq;
-        const start = ctx.currentTime + i * 0.09;
-        g.gain.setValueAtTime(0.0001, start);
-        g.gain.exponentialRampToValueAtTime(0.22, start + 0.02);
-        g.gain.exponentialRampToValueAtTime(0.0001, start + 0.28);
-        o.connect(g); g.connect(ctx.destination);
-        o.start(start); o.stop(start + 0.3);
-      });
-    }catch(e){}
-  }
+            if (!name) {
+                errorMsg.classList.remove('hidden');
+                input.focus();
+                return;
+            }
 
-  function playWrongSound(){
-    try{
-      const ctx = getAudioCtx();
-      const o = ctx.createOscillator();
-      const g = ctx.createGain();
-      o.type = 'sawtooth';
-      o.frequency.setValueAtTime(300, ctx.currentTime);
-      o.frequency.exponentialRampToValueAtTime(110, ctx.currentTime + 0.35);
-      g.gain.setValueAtTime(0.001, ctx.currentTime);
-      g.gain.exponentialRampToValueAtTime(0.18, ctx.currentTime + 0.02);
-      g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.35);
-      o.connect(g); g.connect(ctx.destination);
-      o.start(); o.stop(ctx.currentTime + 0.36);
-    }catch(e){}
-  }
+            studentName = name;
+            document.getElementById('player-display-name').textContent = studentName;
+            document.getElementById('login-modal').classList.add('hidden');
 
-  function playWinFanfare(){
-    try{
-      const ctx = getAudioCtx();
-      const notes = [523.25, 523.25, 523.25, 659.25, 783.99, 1046.5];
-      notes.forEach((freq, i) => {
-        const o = ctx.createOscillator();
-        const g = ctx.createGain();
-        o.type = 'triangle';
-        o.frequency.value = freq;
-        const start = ctx.currentTime + i * 0.12;
-        g.gain.setValueAtTime(0.0001, start);
-        g.gain.exponentialRampToValueAtTime(0.2, start + 0.02);
-        g.gain.exponentialRampToValueAtTime(0.0001, start + 0.3);
-        o.connect(g); g.connect(ctx.destination);
-        o.start(start); o.stop(start + 0.32);
-      });
-    }catch(e){}
-  }
+            initAudio();
+            playSound('whistle');
 
-  /* ===================== SPARKLE STARS ===================== */
-  function launchSparkles(){
-    const layer = document.getElementById('sparkleLayer');
-    if(!layer) return;
-    layer.innerHTML = '';
-    const icons = ['⭐','✨','🌟'];
-    const count = 12;
-    for(let i = 0; i < count; i++){
-      const span = document.createElement('span');
-      span.className = 'sparkle';
-      span.textContent = icons[Math.floor(Math.random() * icons.length)];
-      span.style.left = (5 + Math.random() * 90) + '%';
-      span.style.top = (10 + Math.random() * 70) + '%';
-      span.style.animationDelay = (Math.random() * 0.25) + 's';
-      span.style.fontSize = (1.1 + Math.random() * 1.1) + 'rem';
-      layer.appendChild(span);
-    }
-    setTimeout(() => { layer.innerHTML = ''; }, 1200);
-  }
+            buildTrainCars();
+            loadQuestion(0);
+        }
 
-  const screens = {
-    home: document.getElementById('home-screen'),
-    game: document.getElementById('game-screen'),
-    result: document.getElementById('result-screen')
-  };
+        function buildTrainCars() {
+            const container = document.getElementById('train-cars-container');
+            container.innerHTML = '';
 
-  function showScreen(name){
-    Object.values(screens).forEach(s => s.classList.remove('active'));
-    screens[name].classList.add('active');
-    window.scrollTo(0,0);
-  }
+            questionsData.forEach((q, index) => {
+                const car = document.createElement('div');
+                car.id = `car-${index}`;
+                car.className = `car-item relative flex flex-col items-center transition-all duration-300 shrink-0`;
+                
+                car.innerHTML = `
+                    <div class="absolute -right-2 bottom-4 w-2 h-1.5 bg-gray-500 z-0"></div>
 
-  function openGame(){
-    playClick();
-    currentIndex = 0;
-    score = 0;
-    showScreen('game');
-    renderQuestion();
-  }
+                    <div id="car-body-${index}" class="w-24 h-20 bg-navy border-2 border-sky/50 rounded-xl p-1.5 flex flex-col justify-between items-center shadow-md relative z-10 transition-all">
+                        
+                        <div class="flex justify-between items-center w-full">
+                            <span class="text-[9px] font-bold bg-navy-dark px-1.5 py-0.5 rounded text-gold border border-gold/30">عربة #${q.id}</span>
+                            <span id="car-status-icon-${index}" class="text-sky text-[10px]">
+                                <i class="fa-solid fa-lock text-gray-400"></i>
+                            </span>
+                        </div>
 
-  function goHome(){
-    playClick();
-    showScreen('home');
-  }
+                        <div id="car-slot-${index}" class="w-full flex-1 my-0.5 border border-dashed border-sky/30 rounded flex items-center justify-center p-0.5 text-center bg-navy-dark/50 overflow-hidden">
+                            <span id="car-placeholder-${index}" class="text-[9px] text-sky/60">سؤال ${q.id}</span>
+                        </div>
 
-  function renderQuestion(){
-    locked = false;
-    const q = questions[currentIndex];
-    document.getElementById('qText').textContent = q.text;
-    document.getElementById('questionCounter').textContent =
-      toArabicNum(currentIndex + 1) + ' / ' + toArabicNum(questions.length);
-    document.getElementById('progressBar').style.width =
-      ((currentIndex) / questions.length * 100) + '%';
+                        <div class="w-full text-center">
+                            <span id="car-state-text-${index}" class="text-[8px] font-bold text-gray-300">في الانتظار</span>
+                        </div>
+                    </div>
 
-    const fb = document.getElementById('feedback');
-    fb.className = 'feedback';
-    fb.textContent = '';
+                    <div class="flex gap-2 -mt-2 z-10">
+                        <div class="wheel-${index} w-5 h-5 rounded-full bg-gray-900 border-2 border-gold flex items-center justify-center">
+                            <div class="w-1 h-1 bg-sky rounded-full"></div>
+                        </div>
+                        <div class="wheel-${index} w-5 h-5 rounded-full bg-gray-900 border-2 border-gold flex items-center justify-center">
+                            <div class="w-1 h-1 bg-sky rounded-full"></div>
+                        </div>
+                    </div>
+                `;
 
-    const tfRow = document.getElementById('tfRow');
-    const mcOptions = document.getElementById('mcOptions');
-    const qLabel = document.getElementById('qLabel');
+                container.appendChild(car);
+            });
+        }
 
-    if(q.type === 'tf'){
-      qLabel.textContent = 'هل هذه العبارة صحيحة؟';
-      tfRow.style.display = 'flex';
-      mcOptions.style.display = 'none';
-      mcOptions.innerHTML = '';
+        function loadQuestion(index) {
+            currentQuestionIndex = index;
+            const q = questionsData[index];
 
-      const btnTrue = document.getElementById('btnTrue');
-      const btnFalse = document.getElementById('btnFalse');
-      btnTrue.disabled = false;
-      btnFalse.disabled = false;
-      btnTrue.classList.remove('picked');
-      btnFalse.classList.remove('picked');
-    } else {
-      qLabel.textContent = 'اختاري الإجابة الصحيحة:';
-      tfRow.style.display = 'none';
-      mcOptions.style.display = 'flex';
-      mcOptions.innerHTML = '';
+            document.getElementById('question-badge').innerHTML = `<i class="fa-solid fa-circle-question"></i> السؤال ${q.id} من ${questionsData.length}`;
+            document.getElementById('train-status').textContent = `السؤال: ${q.id} من ${questionsData.length}`;
+            document.getElementById('question-text').textContent = q.text;
 
-      const bullets = ['أ','ب','ج','د','هـ'];
-      q.options.forEach((optText, idx) => {
-        const btn = document.createElement('button');
-        btn.className = 'mc-option';
-        btn.setAttribute('onclick', 'answerMC(' + idx + ')');
-        btn.innerHTML = '<span class="opt-bullet">' + bullets[idx] + '</span><span>' + optText + '</span>';
-        mcOptions.appendChild(btn);
-      });
-    }
-  }
+            questionsData.forEach((_, i) => {
+                const carBody = document.getElementById(`car-body-${i}`);
+                if (i === index) {
+                    carBody.classList.add('active-car');
+                } else {
+                    carBody.classList.remove('active-car');
+                }
+            });
 
-  function answerTF(userAnswer){
-    if(locked) return;
-    locked = true;
-    playClick();
+            // Populate Options for simple tapping
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
 
-    const q = questions[currentIndex];
-    const correct = userAnswer === q.answer;
-    if(correct) score++;
+            q.options.forEach((optText) => {
+                const optBtn = document.createElement('button');
+                optBtn.className = `w-full bg-navy-dark hover:bg-navy border-2 border-gold/60 active:border-gold text-gold hover:text-white p-3 rounded-xl font-bold text-sm leading-relaxed text-right flex items-center justify-between shadow transition-all active:scale-98 gap-2`;
+                optBtn.innerHTML = `
+                    <span class="flex-1">${optText}</span>
+                    <i class="fa-solid fa-chevron-left text-sky text-xs shrink-0"></i>
+                `;
 
-    const btnTrue = document.getElementById('btnTrue');
-    const btnFalse = document.getElementById('btnFalse');
-    btnTrue.disabled = true;
-    btnFalse.disabled = true;
-    (userAnswer ? btnTrue : btnFalse).classList.add('picked');
+                optBtn.onclick = () => checkAnswer(optText);
+                optionsContainer.appendChild(optBtn);
+            });
 
-    showFeedback(correct);
-    advanceAfterDelay();
-  }
+            const fb = document.getElementById('feedback-box');
+            fb.className = "p-2.5 rounded-xl text-center font-bold text-sm hidden transition-all";
 
-  function answerMC(selectedIndex){
-    if(locked) return;
-    locked = true;
-    playClick();
+            scrollToActiveCar(index);
+        }
 
-    const q = questions[currentIndex];
-    const correct = selectedIndex === q.correct;
-    if(correct) score++;
+        function scrollToActiveCar(index) {
+            const carElement = document.getElementById(`car-${index}`);
+            if (carElement) {
+                carElement.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            }
+        }
 
-    const optionButtons = document.querySelectorAll('#mcOptions .mc-option');
-    optionButtons.forEach((btn, idx) => {
-      btn.disabled = true;
-      if(idx === q.correct){ btn.classList.add('correct'); }
-      else if(idx === selectedIndex){ btn.classList.add('wrong'); }
-      else { btn.classList.add('dim'); }
-    });
+        function checkAnswer(selectedOption) {
+            const currentQ = questionsData[currentQuestionIndex];
+            const isCorrect = (selectedOption === currentQ.correct);
 
-    showFeedback(correct);
-    advanceAfterDelay();
-  }
+            if (isCorrect) {
+                playSound('correct');
+                playSound('whistle');
+                triggerConfetti();
 
-  function showFeedback(correct){
-    const fb = document.getElementById('feedback');
-    fb.textContent = correct ? '✅ إجابة صحيحة، أحسنت!' : '❌ إجابة غير صحيحة';
-    fb.className = 'feedback show ' + (correct ? 'correct' : 'wrong');
+                score++;
+                document.getElementById('score-display').textContent = `${score} / ${questionsData.length}`;
 
-    setTimeout(() => {
-      if(correct){ playCorrectSound(); launchSparkles(); }
-      else{ playWrongSound(); }
-    }, 120);
+                const carBody = document.getElementById(`car-body-${currentQuestionIndex}`);
+                const carSlot = document.getElementById(`car-slot-${currentQuestionIndex}`);
+                const carStateText = document.getElementById(`car-state-text-${currentQuestionIndex}`);
+                const carStatusIcon = document.getElementById(`car-status-icon-${currentQuestionIndex}`);
 
-    document.getElementById('progressBar').style.width =
-      ((currentIndex + 1) / questions.length * 100) + '%';
-  }
+                carBody.classList.remove('border-sky/50');
+                carBody.classList.add('border-emerald-400', 'bg-emerald-950/40');
+                carSlot.innerHTML = `<span class="text-[9px] font-black text-gold truncate">${selectedOption}</span>`;
+                carStateText.textContent = "مكتملة ✅";
+                carStateText.className = "text-[8px] font-bold text-emerald-400";
+                carStatusIcon.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400 text-xs"></i>`;
 
-  function advanceAfterDelay(){
-    setTimeout(() => {
-      currentIndex++;
-      if(currentIndex < questions.length){
-        renderQuestion();
-      } else {
-        showResult();
-      }
-    }, 1400);
-  }
+                const randomMsg = positivePhrases[Math.floor(Math.random() * positivePhrases.length)];
+                showFeedback(true, randomMsg);
 
-  function showResult(){
-    showScreen('result');
-    const total = questions.length;
-    document.getElementById('resultScore').textContent =
-      'حصلت على ' + toArabicNum(score) + ' من ' + toArabicNum(total);
+                animateTrainMove();
 
-    let emoji, title, starsCount;
-    const ratio = score / total;
-    if(ratio === 1){ emoji = '🖊️'; title = 'ممتاز! إجابات كاملة'; starsCount = 3; }
-    else if(ratio >= 0.7){ emoji = '🎉'; title = 'أحسنت صنعًا!'; starsCount = 3; }
-    else if(ratio >= 0.4){ emoji = '🙂'; title = 'جيد، حاول مرة أخرى'; starsCount = 2; }
-    else { emoji = '💪'; title = 'حاول مجددًا وستتقن!'; starsCount = 1; }
+                setTimeout(() => {
+                    if (currentQuestionIndex < questionsData.length - 1) {
+                        loadQuestion(currentQuestionIndex + 1);
+                    } else {
+                        endGame();
+                    }
+                }, 1400);
 
-    document.getElementById('resultEmoji').textContent = emoji;
-    document.getElementById('resultTitle').textContent = title;
-    document.getElementById('stars').textContent = '⭐'.repeat(starsCount) + '☆'.repeat(3 - starsCount);
+            } else {
+                playSound('wrong');
 
-    launchConfetti(ratio >= 0.7);
-    setTimeout(() => { if(ratio >= 0.7) playWinFanfare(); }, 200);
-  }
+                const carBody = document.getElementById(`car-body-${currentQuestionIndex}`);
+                carBody.classList.add('shake-err');
+                
+                setTimeout(() => {
+                    carBody.classList.remove('shake-err');
+                }, 500);
 
-  function retryGame(){
-    playClick();
-    openGame();
-  }
+                showFeedback(false, "حاول مرة أخرى!");
+            }
+        }
 
-  function launchConfetti(big){
-    const layer = document.getElementById('confetti');
-    layer.innerHTML = '';
-    const pieces = ['🎉','⭐','🌟','☀️','🎈','✨'];
-    const count = big ? 26 : 14;
-    for(let i=0;i<count;i++){
-      const span = document.createElement('span');
-      span.className = 'confetti-piece';
-      span.textContent = pieces[Math.floor(Math.random()*pieces.length)];
-      span.style.left = Math.random()*100 + '%';
-      span.style.animationDuration = (2.5 + Math.random()*2) + 's';
-      span.style.animationDelay = (Math.random()*0.6) + 's';
-      span.style.fontSize = (1 + Math.random()*1.2) + 'rem';
-      layer.appendChild(span);
-    }
-    setTimeout(() => { layer.innerHTML = ''; }, 5000);
-  }
+        function animateTrainMove() {
+            const wheels = document.querySelectorAll('.wheel, [class*="wheel-"]');
+            wheels.forEach(w => w.classList.add('wheel-spinning'));
 
-  let toastTimer;
-  function comingSoon(){
-    playClick();
-    const toast = document.getElementById('toast');
-    toast.textContent = '🌞 هذه اللعبة قادمة قريبًا إن شاء الله!';
-    toast.classList.add('show');
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
-  }
-</script>
+            const trainAssembly = document.getElementById('train-assembly');
+            trainAssembly.style.transform = 'translateX(-10px)';
+
+            setTimeout(() => {
+                trainAssembly.style.transform = 'translateX(0px)';
+                wheels.forEach(w => w.classList.remove('wheel-spinning'));
+            }, 600);
+        }
+
+        function showFeedback(isSuccess, message) {
+            const fb = document.getElementById('feedback-box');
+            fb.classList.remove('hidden', 'bg-emerald-900/80', 'text-emerald-200', 'border-emerald-500', 'bg-red-900/80', 'text-red-200', 'border-red-500');
+            
+            if (isSuccess) {
+                fb.classList.add('bg-emerald-900/90', 'text-emerald-200', 'border', 'border-emerald-500');
+                fb.innerHTML = `<i class="fa-solid fa-star text-gold text-sm mr-1"></i> ${message}`;
+            } else {
+                fb.classList.add('bg-red-900/90', 'text-red-200', 'border', 'border-red-500');
+                fb.innerHTML = `<i class="fa-solid fa-circle-xmark text-red-400 text-sm mr-1"></i> ${message}`;
+            }
+        }
+
+        function triggerConfetti() {
+            if (typeof confetti === 'function') {
+                confetti({
+                    particleCount: 35,
+                    spread: 50,
+                    origin: { y: 0.8 }
+                });
+            }
+        }
+
+        function endGame() {
+            document.getElementById('win-student-name').textContent = studentName;
+            document.getElementById('win-score').textContent = `${score} / ${questionsData.length}`;
+            document.getElementById('win-modal').classList.remove('hidden');
+
+            if (typeof confetti === 'function') {
+                confetti({
+                    particleCount: 85,
+                    spread: 75,
+                    origin: { y: 0.6 }
+                });
+            }
+        }
+
+        function restartGame() {
+            score = 0;
+            currentQuestionIndex = 0;
+            document.getElementById('score-display').textContent = `0 / ${questionsData.length}`;
+            document.getElementById('win-modal').classList.add('hidden');
+            
+            buildTrainCars();
+            loadQuestion(0);
+        }
+    </script>
 </body>
 </html>
+```
